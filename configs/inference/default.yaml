@@ -1,0 +1,18 @@
+# @package _global_
+
+inference:
+  checkpoint_path: models/final_model.pt
+  n_samples: 30
+  batch_size: 512
+
+  output:
+    dir: results
+    save_predictions: true
+    save_to_s3: true
+    s3_prefix: results/predictions
+
+  metrics:
+    - mse
+    - mae
+    - rmse
+    - r2

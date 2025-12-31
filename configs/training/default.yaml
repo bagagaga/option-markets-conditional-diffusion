@@ -1,0 +1,46 @@
+# @package _global_
+
+training:
+  # Optimizer settings
+  optimizer:
+    name: Adam
+    lr: 0.001
+    weight_decay: 0.0
+    betas: [0.9, 0.999]
+
+  # Training loop
+  epochs: 100
+  batch_size: 256
+  val_every: 1  # Validate every N epochs
+  save_every: 10  # Save checkpoint every N epochs
+
+  # Early stopping
+  early_stopping:
+    enabled: false
+    patience: 10
+    min_delta: 0.001
+
+  # Gradient clipping
+  grad_clip:
+    enabled: false
+    max_norm: 1.0
+
+# MLflow logging
+mlflow:
+  tracking_uri: ${oc.env:MLFLOW_TRACKING_URI,http://mlflow-prod:5000}
+  experiment_name: ${experiment.name}
+  run_name: ${experiment.run_name}
+  log_every: 1  # Log metrics every N epochs
+  
+  # What to log
+  log_params: true
+  log_metrics: true
+  log_artifacts: true
+  log_model: true
+
+checkpoint:
+  dir: models
+  save_best: true
+  monitor: val_loss
+  mode: min
+  filename: "{epoch:03d}_{val_loss:.4f}"

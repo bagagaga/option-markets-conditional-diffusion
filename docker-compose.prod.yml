@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mlflow-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: mlflow-prod
+    depends_on:
+      - postgres-prod
+    ports:
+      - "5051:5000"
+    environment:
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: admin123
+      MLFLOW_TRACKING_URI: "http://localhost:5051"
+    restart: unless-stopped
+    networks:
+      - prod-network
+
+  postgres-prod:
+    image: postgres:16.3-alpine
+    container_name: postgres-prod
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres-prod-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - prod-network
+
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: option-diffusion-trainer
+    depends_on:
+      - mlflow-prod
+      - postgres-prod
+    volumes:
+      - ./:/workspace
+      - ./data:/workspace/data
+      - ./models:/workspace/models
+      - ./logs:/workspace/logs
+      - dvc-cache:/root/.dvc/cache
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow-prod:5000
+      - PYTHONUNBUFFERED=1
+      - HYDRA_FULL_ERROR=1
+    networks:
+      - prod-network
+    working_dir: /workspace
+    command: tail -f /dev/null  # Keeps the container running for interactive use
+
+volumes:
+  postgres-prod-data:
+  dvc-cache:
+
+networks:
+  prod-network:
+    driver: bridge

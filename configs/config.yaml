@@ -1,0 +1,23 @@
+# Hierarchical Hydra configuration - Main config
+defaults:
+  - data: panel
+  - model: tiny_ddpm
+  - training: default
+  - inference: default
+  - _self_
+
+# Experiment name - just the timestamp
+experiment:
+  name: option-markets-diffusion
+  run_name: ${now:%Y-%m-%d_%H-%M-%S}
+  seed: 42
+
+# Hydra output directory configuration
+hydra:
+  run:
+    dir: logs/hydra/${experiment.name}/${experiment.run_name}
+  job:
+    chdir: false  # Don't change working directory
+
+# Device configuration
+device: cuda  # Will fallback to cpu if cuda not available

@@ -1,0 +1,36 @@
+# @package _global_
+
+# Public dataset URL (no authentication required)
+data:
+  url: https://storage.yandexcloud.net/option-dataset/spx_multiline_panel.csv
+  s3_key: baselines/spx_multiline_panel.csv  # Used when url is not set
+  local_cache: data/cache
+
+# S3 Configuration for Yandex Cloud (optional, for private datasets)
+s3:
+  endpoint: ${oc.env:YC_S3_ENDPOINT,https://storage.yandexcloud.net}
+  access_key: ${oc.env:YC_S3_ACCESS_KEY,}
+  secret_key: ${oc.env:YC_S3_SECRET_KEY,}
+  region: ${oc.env:YC_S3_REGION,ru-central1}
+  bucket: ${oc.env:YC_S3_BUCKET,}
+
+# Feature configuration
+features:
+  - C_close
+  - F_close
+  - tau_yrs
+  - m
+  - C_ret1
+  - F_ret1
+  - C_d1
+  - F_d1
+  - dow_sin
+  - dow_cos
+
+# Target configuration
+target: dC_next
+
+# Data split
+split:
+  val_frac: 0.2  # 20% for validation
+  method: time_based  # Ensure no data leakage
